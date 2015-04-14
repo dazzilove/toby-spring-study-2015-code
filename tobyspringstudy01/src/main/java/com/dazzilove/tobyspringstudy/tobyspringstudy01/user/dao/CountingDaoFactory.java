@@ -1,32 +1,37 @@
 package com.dazzilove.tobyspringstudy.tobyspringstudy01.user.dao;
 
+import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 public class CountingDaoFactory {
 	@Bean
 	public UserDao userDao() {
 		UserDao userDao = new UserDao();
-		userDao.setConnectionMaker(connectionMaker());
+		userDao.setDataSource(dataSource());
 		return userDao;
 	}
 
 	@Bean
 	public AccountDao accountDao() {
-		return new AccountDao(connectionMaker());
+		return new AccountDao();
 	}
 
 	@Bean
 	public MessageDao messageDao() {
-		return new MessageDao(connectionMaker());
-	}
-
-	@Bean
-	public ConnectionMaker connectionMaker() {
-		return new CountingConnectionMaker(realConnectionMaker());
+		return new MessageDao();
 	}
 	
 	@Bean
-	public ConnectionMaker realConnectionMaker() {
-		return new DConnectionMaker();
+	public DataSource dataSource() {
+		SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+		
+		dataSource.setDriverClass(com.mysql.jdbc.Driver.class);
+		dataSource.setUrl("jdbc:mysql://localhost/springbook");
+		dataSource.setUsername("root");
+		dataSource.setPassword("dazzilove");
+		
+		return dataSource;
 	}
 }
