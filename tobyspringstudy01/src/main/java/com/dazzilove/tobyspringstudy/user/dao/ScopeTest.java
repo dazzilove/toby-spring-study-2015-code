@@ -1,4 +1,4 @@
-package com.dazzilove.tobyspringstudy.tobyspringstudy01.user.dao;
+package com.dazzilove.tobyspringstudy.user.dao;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

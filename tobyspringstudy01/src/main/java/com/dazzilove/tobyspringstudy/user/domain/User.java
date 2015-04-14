@@ -1,4 +1,4 @@
-package com.dazzilove.tobyspringstudy.tobyspringstudy01.user.domain;
+package com.dazzilove.tobyspringstudy.user.domain;
 
 /**
  * create table users {

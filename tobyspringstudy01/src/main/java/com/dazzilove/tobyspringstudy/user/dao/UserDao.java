@@ -1,4 +1,4 @@
-package com.dazzilove.tobyspringstudy.tobyspringstudy01.user.dao;
+package com.dazzilove.tobyspringstudy.user.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import com.dazzilove.tobyspringstudy.tobyspringstudy01.user.domain.User;
+import com.dazzilove.tobyspringstudy.user.domain.User;
 
 public class UserDao {
 	private DataSource dataSource;	

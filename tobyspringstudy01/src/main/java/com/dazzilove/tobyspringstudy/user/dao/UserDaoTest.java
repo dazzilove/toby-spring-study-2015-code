@@ -1,17 +1,12 @@
-package com.dazzilove.tobyspringstudy.tobyspringstudy01.user.dao;
+package com.dazzilove.tobyspringstudy.user.dao;
 
 import java.sql.SQLException;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import com.dazzilove.tobyspringstudy.user.domain.User;
 
-import com.dazzilove.tobyspringstudy.tobyspringstudy01.user.domain.User;
-
-public class DaoFactoryTest {
+public class UserDaoTest {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
-		ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-		
-		UserDao userDao = context.getBean("userDao", UserDao.class);
+		UserDao userDao = new DaoFactory().userDao();
 		
 		User user = new User();
 		user.setId("dazzilove");
