@@ -11,8 +11,7 @@ import com.dazzilove.tobyspringstudy.tobyspringstudy01.user.domain.User;
 public class UserDao {
 	private ConnectionMaker connectionMaker;	
 	
-	public UserDao(ConnectionMaker connectionMaker) {
-		System.out.println("UserDao called");
+	public void setConnectionMaker(ConnectionMaker connectionMaker) {
 		this.connectionMaker = connectionMaker;
 	}
 	
