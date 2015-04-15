@@ -2,6 +2,8 @@ package com.dazzilove.tobyspringstudy.user.dao;
 
 import java.sql.SQLException;
 
+import org.springframework.test.annotation.DirtiesContext;
+
 import com.dazzilove.tobyspringstudy.user.domain.User;
 
 public class UserDaoTest {

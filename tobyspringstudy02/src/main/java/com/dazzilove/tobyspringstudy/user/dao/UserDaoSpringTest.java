@@ -2,33 +2,84 @@ package com.dazzilove.tobyspringstudy.user.dao;
 
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 import com.dazzilove.tobyspringstudy.user.domain.User;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations="test-applicationContext.xml")
 public class UserDaoSpringTest {
-	public static void main(String[] args) throws ClassNotFoundException, SQLException {
-		ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml", UserDao.class);
+	
+	UserDao dao;
+	User user1;
+	User user2;
+	User user3;
+	
+	@Autowired
+	private ApplicationContext context;
+	
+	@Before
+	public void setUp() {
+		dao = this.context.getBean("userDao", UserDao.class);
+
+		this.user1 = new User("ryush", "류성희1", "qlalfqjsgh");
+		this.user2 = new User("kimsh", "김성호1", "skfktkgkd");
+		this.user3 = new User("kimhun", "김훈1", "qlalfqjsgh");
+	}
+	
+	@Test
+	public void andAndGet() throws ClassNotFoundException, SQLException {	
+		dao.deleteAll();
+		assertThat(dao.getCount(), is(0));
 		
-		UserDao userDao = context.getBean("userDao", UserDao.class);
+		dao.add(user1);
+		dao.add(user2);
+		assertThat(dao.getCount(), is(2));
 		
-		User user = new User();
-		user.setId("dazzilove");
-		user.setName("류성희");
-		user.setPassword("qawsedrf");
+		User userget1 = dao.get(user1.getId());
+		assertThat(userget1.getName(), is(user1.getName()));
+		assertThat(userget1.getPassword(), is(user1.getPassword()));
 		
-		userDao.add(user);
+		User userget2 = dao.get(user2.getId());
+		assertThat(userget2.getName(), is(user2.getName()));
+		assertThat(userget2.getPassword(), is(user2.getPassword()));
 		
-		System.out.println(user.getId() + " 등록 성공");
+	}
+	
+	@Test
+	public void count() throws ClassNotFoundException, SQLException {
+		dao.deleteAll();
+		assertThat(dao.getCount(), is(0));
 		
-		User user2 = userDao.get(user.getId());
-		System.out.println(user2.getName());
-		System.out.println(user2.getPassword());
+		dao.add(user1);
+		assertThat(dao.getCount(), is(1));
 		
-		System.out.println(user2.getId() + " 조회 성공");
+		dao.add(user2);
+		assertThat(dao.getCount(), is(2));
+		
+		dao.add(user3);
+		assertThat(dao.getCount(), is(3));
+	}
+	
+	@Test(expected=EmptyResultDataAccessException.class)
+	public void getUserFailure() throws SQLException, ClassNotFoundException {
+		dao.deleteAll();
+		assertThat(dao.getCount(), is(0));
+		
+		dao.get("unkonow_id");
 	}
 
 }

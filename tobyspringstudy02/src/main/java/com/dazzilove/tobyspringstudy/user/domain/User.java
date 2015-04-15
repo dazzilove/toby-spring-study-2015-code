@@ -1,17 +1,27 @@
 package com.dazzilove.tobyspringstudy.user.domain;
 
 /**
- * create table users {
+ * create table users (
  * 	id varchar(10) primary key,
  * 	name varchar(20) not null,
  * 	password varchar(10) not null
- * }
+ * )
  */
 
 public class User {
 	String id;
 	String name;
 	String password;
+	
+	public User() {
+		
+	}
+	
+	public User(String id, String name, String password) {
+		this.id = id;
+		this.name = name;
+		this.password = password;
+	}
 	
 	public String getId() {
 		return id;
