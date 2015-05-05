@@ -41,7 +41,7 @@ public class UserDaoSpringTest {
 	}
 	
 	@Test
-	public void andAndGet() throws ClassNotFoundException, SQLException {	
+	public void addAndGet() throws ClassNotFoundException, SQLException {	
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
