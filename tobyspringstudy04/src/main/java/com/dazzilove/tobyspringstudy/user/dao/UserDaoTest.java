@@ -8,7 +8,7 @@ import com.dazzilove.tobyspringstudy.user.domain.User;
 
 public class UserDaoTest {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
-		UserDao userDao = new DaoFactory().userDao();
+		UserDaoJdbc userDao = new DaoFactory().userDao();
 		
 		User user = new User();
 		user.setId("dazzilove");

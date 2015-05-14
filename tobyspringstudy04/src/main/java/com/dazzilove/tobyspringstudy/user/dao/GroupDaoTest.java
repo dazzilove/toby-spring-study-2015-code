@@ -16,11 +16,11 @@ public class GroupDaoTest {
 	@Autowired
 	private ApplicationContext context;
 	
-	UserDao dao;
+	UserDaoJdbc dao;
 	
 	@Test
 	public void test() {
-		dao = this.context.getBean("userDao", UserDao.class);
+		dao = this.context.getBean("userDao", UserDaoJdbc.class);
 	}
 
 }

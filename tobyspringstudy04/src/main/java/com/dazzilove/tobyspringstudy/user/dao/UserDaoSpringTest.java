@@ -1,37 +1,47 @@
 package com.dazzilove.tobyspringstudy.user.dao;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.sql.DataSource;
+
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.dazzilove.tobyspringstudy.user.domain.User;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="test-applicationContext.xml")
 public class UserDaoSpringTest {
 	
-	UserDao dao;
+	UserDaoJdbc dao;
 	User user1;
 	User user2;
 	User user3;
 	
 	@Autowired
 	private ApplicationContext context;
+	@Autowired
+	private DataSource dataSource;
 	
 	@Before
 	public void setUp() {
-		dao = this.context.getBean("userDao", UserDao.class);
+		dao = this.context.getBean("userDao", UserDaoJdbc.class);
 
 		this.user1 = new User("kimhun", "김훈1", "qlalfqjsgh");
 		this.user2 = new User("kimsh", "김성호1", "skfktkgkd");
@@ -105,11 +115,35 @@ public class UserDaoSpringTest {
 		checkSameUser(user2, users3.get(1));
 		checkSameUser(user3, users3.get(2));
 	}
+	
+	@Test(expected=DataAccessException.class)
+	public void duplicateKey() throws SQLException, ClassNotFoundException {
+		dao.deleteAll();
+		
+		dao.add(user1);
+		dao.add(user1);
+	}
+	
+	@Test
+	public void sqlExceptionTranslate() throws ClassNotFoundException, SQLException {
+		dao.deleteAll();
+		
+		try {
+			dao.add(user1);
+			dao.add(user1);
+		} catch (DuplicateKeyException e) {
+			SQLException sqlEx = (SQLException)e.getRootCause();
+			SQLExceptionTranslator set = new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
+			
+			assertThat(set.translate(null, null, sqlEx), is(DataAccessException.class));
+		}
+	}
 
 	private void checkSameUser(User user1, User user2) {
 		assertThat(user1.getId(), is(user2.getId()));
 		assertThat(user1.getName(), is(user2.getName()));
 		assertThat(user1.getPassword(), is(user2.getPassword()));
 	}
+	
 
 }

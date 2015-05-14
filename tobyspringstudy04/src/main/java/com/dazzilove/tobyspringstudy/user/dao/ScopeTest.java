@@ -7,15 +7,15 @@ public class ScopeTest {
 	
 	public static void main(String[] arg) {
 		DaoFactory factory = new DaoFactory();
-		UserDao dao1 = factory.userDao();
-		UserDao dao2 = factory.userDao();
+		UserDaoJdbc dao1 = factory.userDao();
+		UserDaoJdbc dao2 = factory.userDao();
 		
 		System.out.println(dao1);
 		System.out.println(dao2);
 		
 		ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-		UserDao dao3 = context.getBean("userDao", UserDao.class);
-		UserDao dao4 = context.getBean("userDao", UserDao.class);
+		UserDaoJdbc dao3 = context.getBean("userDao", UserDaoJdbc.class);
+		UserDaoJdbc dao4 = context.getBean("userDao", UserDaoJdbc.class);
 		
 		System.out.println(dao3);
 		System.out.println(dao4);
