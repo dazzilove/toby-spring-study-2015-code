@@ -6,9 +6,10 @@ import java.util.List;
 import com.dazzilove.tobyspringstudy.user.domain.User;
 
 public interface UserDao {
-	void add(User user)  throws ClassNotFoundException, SQLException;
-	User get(String id) throws ClassNotFoundException, SQLException;
+	void add(User user);
+	User get(String id);
 	List<User> getAll();
-	void deleteAll() throws SQLException;
-	int getCount() throws SQLException;
+	void deleteAll();
+	int getCount();
+	void update(User user);
 }

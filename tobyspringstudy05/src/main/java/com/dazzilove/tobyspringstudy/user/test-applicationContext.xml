@@ -14,4 +14,13 @@
 	<bean id="userDao" class="com.dazzilove.tobyspringstudy.user.dao.UserDaoJdbc">
 		<property name="dataSource" ref="dataSource"></property>
 	</bean>
+	
+	<bean id="userLevelUpgradePolicy" class="com.dazzilove.tobyspringstudy.user.service.UserLevelUpgradePolicyImpl">
+		<property name="userDao" ref="userDao"></property>
+	</bean>
+	
+	<bean id="userService" class="com.dazzilove.tobyspringstudy.user.service.UserService">
+		<property name="userDao" ref="userDao"></property>
+		<property name="userLevelUpgradePolicy" ref="userLevelUpgradePolicy"></property>
+	</bean>
 </beans>

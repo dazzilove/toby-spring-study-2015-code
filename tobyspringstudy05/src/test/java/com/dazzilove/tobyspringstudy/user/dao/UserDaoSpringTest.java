@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="test-applicationContext.xml")
+@ContextConfiguration(locations="../test-applicationContext.xml")
 public class UserDaoSpringTest {
 	
 	UserDaoJdbc dao;
@@ -50,7 +50,7 @@ public class UserDaoSpringTest {
 	}
 	
 	@Test
-	public void addAndGet() throws ClassNotFoundException, SQLException {	
+	public void addAndGet() {	
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
@@ -67,7 +67,7 @@ public class UserDaoSpringTest {
 	}
 	
 	@Test
-	public void count() throws ClassNotFoundException, SQLException {
+	public void count() {
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
@@ -82,7 +82,7 @@ public class UserDaoSpringTest {
 	}
 	
 	@Test(expected=EmptyResultDataAccessException.class)
-	public void getUserFailure() throws SQLException, ClassNotFoundException {
+	public void getUserFailure() {
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
@@ -90,7 +90,7 @@ public class UserDaoSpringTest {
 	}
 	
 	@Test
-	public void getAll() throws ClassNotFoundException, SQLException {
+	public void getAll() {
 		dao.deleteAll();
 		
 		List<User> users0 = dao.getAll();
@@ -124,7 +124,7 @@ public class UserDaoSpringTest {
 	}
 	
 	@Test
-	public void sqlExceptionTranslate() throws ClassNotFoundException, SQLException {
+	public void sqlExceptionTranslate() {
 		dao.deleteAll();
 		
 		try {
@@ -136,6 +136,26 @@ public class UserDaoSpringTest {
 			
 			assertThat(set.translate(null, null, sqlEx), is(DataAccessException.class));
 		}
+	}
+	
+	@Test
+	public void update() {
+		dao.deleteAll();
+		
+		dao.add(user1);
+		dao.add(user2);
+		
+		user1.setName("오민규");
+		user1.setPassword("spring6");
+		user1.setLevel(Level.GOLD);
+		user1.setLogin(1000);
+		user1.setRecommend(999);
+		dao.update(user1);
+		
+		User user1Update = dao.get(user1.getId());
+		checkSameUser(user1, user1Update);
+		User user2Same = dao.get(user2.getId());
+		checkSameUser(user2, user2Same);
 	}
 
 	private void checkSameUser(User user1, User user2) {
