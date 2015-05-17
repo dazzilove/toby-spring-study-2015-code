@@ -21,6 +21,5 @@
 	
 	<bean id="userService" class="com.dazzilove.tobyspringstudy.user.service.UserService">
 		<property name="userDao" ref="userDao"></property>
-		<property name="userLevelUpgradePolicy" ref="userLevelUpgradePolicy"></property>
 	</bean>
 </beans>
