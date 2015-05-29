@@ -10,6 +10,7 @@ package com.dazzilove.tobyspringstudy.user.domain;
  * alter table users add (level tinyint not null);
  * alter table users add (login int not null);
  * alter table users add (recommend int not null);
+ * alter table users add (email varchar(40) not null);
  */
 
 public class User {
@@ -95,7 +96,7 @@ public class User {
 	}
 
 	public String getEmail() {
-		return "dazzilove@11st.co.kr";
+		return email;
 	}
 
 	public void setEmail(String email) {

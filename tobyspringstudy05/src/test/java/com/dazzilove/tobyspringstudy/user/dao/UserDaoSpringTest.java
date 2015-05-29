@@ -44,9 +44,9 @@ public class UserDaoSpringTest {
 	public void setUp() {
 		dao = this.context.getBean("userDao", UserDaoJdbc.class);
 
-		this.user1 = new User("kimhun", "김훈1", "qlalfqjsgh", Level.BASIC, 1, 0);
-		this.user2 = new User("kimsh", "김성호1", "skfktkgkd", Level.SILVER, 55, 10);
-		this.user3 = new User("ryush", "류성희1", "qlalfqjsgh", Level.GOLD, 100, 40);
+		this.user1 = new User("kimhun", "김훈1", "qlalfqjsgh", Level.BASIC, 1, 0, "kimhun@11st.co.kr");
+		this.user2 = new User("kimsh", "김성호1", "skfktkgkd", Level.SILVER, 55, 10, "kimsh@11st.co.kr");
+		this.user3 = new User("ryush", "류성희1", "qlalfqjsgh", Level.GOLD, 100, 40, "ryush@11st.co.kr");
 	}
 	
 	@Test
