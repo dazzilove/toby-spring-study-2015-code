@@ -23,9 +23,21 @@
 		<property name="userDao" ref="userDao"></property>
 	</bean>
 	
+	<!-- 
 	<bean id="userService" class="com.dazzilove.tobyspringstudy.user.service.UserService">
 		<property name="userDao" ref="userDao"></property>
 		<property name="transactionManager" ref="transactionManager"></property>
+		<property name="mailSender" ref="mailSender"></property>
+	</bean>
+	 -->
+	
+	<bean id="userService" class="com.dazzilove.tobyspringstudy.user.service.UserServiceTx">
+		<property name="transactionManager" ref="transactionManager"></property>
+		<property name="userService" ref="userServiceImpl"></property>
+	</bean>
+	
+	<bean id="userServiceImpl" class="com.dazzilove.tobyspringstudy.user.service.UserServiceImpl">
+		<property name="userDao" ref="userDao"></property>
 		<property name="mailSender" ref="mailSender"></property>
 	</bean>
 	

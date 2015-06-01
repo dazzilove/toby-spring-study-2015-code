@@ -1,10 +1,11 @@
 package com.dazzilove.tobyspringstudy.user.service;
 
-import static com.dazzilove.tobyspringstudy.user.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
-import static com.dazzilove.tobyspringstudy.user.service.UserService.MIN_RECOMMEND_FOR_GOLD;
+import static com.dazzilove.tobyspringstudy.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
+import static com.dazzilove.tobyspringstudy.user.service.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,6 +25,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.dazzilove.tobyspringstudy.mail.MailSender;
 import com.dazzilove.tobyspringstudy.mail.MockMailSender;
+import com.dazzilove.tobyspringstudy.mail.SimpleMailMessage;
+import com.dazzilove.tobyspringstudy.user.dao.MockUserDao;
 import com.dazzilove.tobyspringstudy.user.dao.UserDao;
 import com.dazzilove.tobyspringstudy.user.domain.Level;
 import com.dazzilove.tobyspringstudy.user.domain.User;
@@ -37,7 +41,9 @@ public class UserServiceTest {
 	List<User> users;
 	
 	@Autowired
-	UserService userService;
+	UserServiceImpl userService;
+	@Autowired
+	UserServiceImpl userServiceImpl;
 	@Autowired
 	UserDao userDao;
 	@Autowired
@@ -59,7 +65,6 @@ public class UserServiceTest {
 	}
 	
 	@Test
-	@Ignore
 	public void updateLevel() throws Exception {
 		userDao.deleteAll();
 		for(User user : users) userDao.add(user);
@@ -103,16 +108,19 @@ public class UserServiceTest {
 	
 	@Test
 	public void upgradeAllOrNothing() throws Exception {
-		UserService testUserService = new TestUserService(users.get(3).getId());
+		UserServiceImpl testUserService = new TestUserService(users.get(3).getId());
 		testUserService.setUserDao(userDao);
-		testUserService.setTransactionManager(transactionManager);
 		testUserService.setMailSender(mailSender);
+		
+		UserServiceTx txUserService = new UserServiceTx();
+		txUserService.setTransactionManager(transactionManager);
+		txUserService.setUserService(testUserService);
 		
 		userDao.deleteAll();
 		for(User user:users) userDao.add(user);
 		
 		try {
-			testUserService.upgradeLevels();
+			txUserService.upgradeLevels();
 			fail("TestUserServiceException expected");
 		} catch(TestUserServiceException e) {
 			// Nothing TODO
@@ -124,25 +132,57 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	public void upgradeLevels() throws Exception {
-		userDao.deleteAll();
+		UserServiceImpl userServiceImpl = new UserServiceImpl();
 		
-		for(User user:users) userDao.add(user);
+		MockUserDao mockUserDao = new MockUserDao(this.users);
+		userServiceImpl.setUserDao(mockUserDao);
 		
 		MockMailSender mockMailSender = new MockMailSender();
-		userService.setMailSender(mockMailSender);
+		userServiceImpl.setMailSender(mockMailSender);
 		
-		userService.upgradeLevels();
+		userServiceImpl.upgradeLevels();
 		
-		checkLevelUpgraded(users.get(0), false);
-		checkLevelUpgraded(users.get(1), true);
-		checkLevelUpgraded(users.get(2), false);
-		checkLevelUpgraded(users.get(3), true);
-		checkLevelUpgraded(users.get(4), false);
-		
+		List<User> updated = mockUserDao.getUpdated();
+		assertThat(updated.size(), is(2));
+		checkUserAndLevle(updated.get(0), "joytouch", Level.SILVER);
+		checkUserAndLevle(updated.get(1), "madnite1", Level.GOLD);
+
 		List<String> request = mockMailSender.getRequests();
 		assertThat(request.size(), is(2));
 		assertThat(request.get(0), is(users.get(1).getEmail()));
 		assertThat(request.get(1), is(users.get(3).getEmail()));
+	}
+
+	private void checkUserAndLevle(User updated, String expectedId, Level expectedLevel) {
+		assertThat(updated.getId(), is(expectedId));
+		assertThat(updated.getLevel(), is(expectedLevel));
+	}
+	
+	@Test
+	public void mockUpgradeLevels() throws Exception {
+		UserServiceImpl userServiceImpl = new UserServiceImpl();
+		
+		UserDao mockUserDao = mock(UserDao.class);
+		when(mockUserDao.getAll()).thenReturn(this.users);
+		userServiceImpl.setUserDao(mockUserDao);
+		
+		MailSender mockMailSender = mock(MailSender.class);
+		userServiceImpl.setMailSender(mockMailSender);
+		
+		userServiceImpl.upgradeLevels();
+		
+		verify(mockUserDao, times(2)).update(any(User.class));
+		verify(mockUserDao, times(2)).update(any(User.class));
+		verify(mockUserDao).update(users.get(1));
+		assertThat(users.get(1).getLevel(), is(Level.SILVER));
+		verify(mockUserDao).update(users.get(3));
+		assertThat(users.get(3).getLevel(), is(Level.GOLD));
+		
+		ArgumentCaptor<SimpleMailMessage> mailMessageArg = ArgumentCaptor.forClass(SimpleMailMessage.class);
+		verify(mockMailSender, times(2)).send(mailMessageArg.capture());
+		List<SimpleMailMessage> mailMessages = mailMessageArg.getAllValues();
+		assertThat(mailMessages.get(0).getTo(), is(users.get(1).getEmail()));
+		assertThat(mailMessages.get(1).getTo(), is(users.get(3).getEmail()));
 	}
 
 
