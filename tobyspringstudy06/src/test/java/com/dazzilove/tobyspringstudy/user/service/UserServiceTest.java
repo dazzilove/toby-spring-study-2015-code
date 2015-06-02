@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import com.dazzilove.tobyspringstudy.user.dao.UserDao;
 import com.dazzilove.tobyspringstudy.user.domain.Level;
 import com.dazzilove.tobyspringstudy.user.domain.User;
 import com.dazzilove.tobyspringstudy.user.service.TestUserService.TestUserServiceException;
+import com.dazzilove.tobyspringstudy.util.TransactionHandler;
 
 
 
@@ -112,9 +114,40 @@ public class UserServiceTest {
 		testUserService.setUserDao(userDao);
 		testUserService.setMailSender(mailSender);
 		
+		TransactionHandler txHandler = new TransactionHandler();
+		txHandler.setTarget(testUserService);
+		txHandler.setTransactionMananger(transactionManager);
+		txHandler.setPattern("upgradeLevles");
+		
 		UserServiceTx txUserService = new UserServiceTx();
 		txUserService.setTransactionManager(transactionManager);
 		txUserService.setUserService(testUserService);
+		
+		userDao.deleteAll();
+		for(User user:users) userDao.add(user);
+		
+		try {
+			txUserService.upgradeLevels();
+			fail("TestUserServiceException expected");
+		} catch(TestUserServiceException e) {
+			// Nothing TODO
+		} 
+		
+		checkLevelUpgraded(users.get(1), false);
+	}
+	
+	@Test
+	public void upgradeAllOrNothingByProxy() throws Exception {
+		UserServiceImpl testUserService = new TestUserService(users.get(3).getId());
+		testUserService.setUserDao(userDao);
+		testUserService.setMailSender(mailSender);
+		
+		TransactionHandler txHandler = new TransactionHandler();
+		txHandler.setTarget(testUserService);
+		txHandler.setTransactionMananger(transactionManager);
+		txHandler.setPattern("upgradeLevels");
+		
+		UserService txUserService = (UserService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { UserService.class }, txHandler);
 		
 		userDao.deleteAll();
 		for(User user:users) userDao.add(user);
