@@ -18,6 +18,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
@@ -167,15 +168,15 @@ public class UserServiceTest {
 	
 	@Test
 	@DirtiesContext
-	public void upgradeAllOrNothingByTxProxyBeanFactory() throws Exception {
+	public void upgradeAllOrNothingBySpringProxyBeanFactory() throws Exception {
 		TestUserService testUserService = new TestUserService(users.get(3).getId());
 		testUserService.setUserDao(userDao);
 		testUserService.setMailSender(mailSender);
 		
-		TxProxyFactoryBean txProxyBeanFactory = context.getBean("&userService", TxProxyFactoryBean.class);
-		txProxyBeanFactory.setTarget(testUserService);
+		ProxyFactoryBean proxyBeanFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
+		proxyBeanFactoryBean.setTarget(testUserService);
 
-		UserService txUserService = (UserService) txProxyBeanFactory.getObject();
+		UserService txUserService = (UserService) proxyBeanFactoryBean.getObject();
 		
 		userDao.deleteAll();
 		for(User user:users) userDao.add(user);
