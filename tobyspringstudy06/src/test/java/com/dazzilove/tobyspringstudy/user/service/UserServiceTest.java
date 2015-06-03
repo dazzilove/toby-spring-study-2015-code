@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -42,6 +43,8 @@ public class UserServiceTest {
 	
 	List<User> users;
 	
+	@Autowired
+	ApplicationContext context;
 	@Autowired
 	UserServiceImpl userService;
 	@Autowired
@@ -117,7 +120,7 @@ public class UserServiceTest {
 		TransactionHandler txHandler = new TransactionHandler();
 		txHandler.setTarget(testUserService);
 		txHandler.setTransactionMananger(transactionManager);
-		txHandler.setPattern("upgradeLevles");
+		txHandler.setPattern("upgradeLevels");
 		
 		UserServiceTx txUserService = new UserServiceTx();
 		txUserService.setTransactionManager(transactionManager);
@@ -160,6 +163,32 @@ public class UserServiceTest {
 		} 
 		
 		checkLevelUpgraded(users.get(1), false);
+	}
+	
+	@Test
+	@DirtiesContext
+	public void upgradeAllOrNothingByTxProxyBeanFactory() throws Exception {
+		TestUserService testUserService = new TestUserService(users.get(3).getId());
+		testUserService.setUserDao(userDao);
+		testUserService.setMailSender(mailSender);
+		
+		TxProxyFactoryBean txProxyBeanFactory = context.getBean("&userService", TxProxyFactoryBean.class);
+		txProxyBeanFactory.setTarget(testUserService);
+
+		UserService txUserService = (UserService) txProxyBeanFactory.getObject();
+		
+		userDao.deleteAll();
+		for(User user:users) userDao.add(user);
+		
+		try {
+			txUserService.upgradeLevels();
+			fail("TestUserServiceException expected");
+		} catch(TestUserServiceException e) {
+			System.out.println("TestUserServiceException 발생!!");
+		}
+		
+		checkLevelUpgraded(users.get(1), false);
+		
 	}
 	
 	@Test

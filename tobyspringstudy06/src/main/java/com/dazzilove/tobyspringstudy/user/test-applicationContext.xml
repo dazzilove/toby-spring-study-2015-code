@@ -31,9 +31,18 @@
 	</bean>
 	 -->
 	
+	<!-- 
 	<bean id="userService" class="com.dazzilove.tobyspringstudy.user.service.UserServiceTx">
 		<property name="transactionManager" ref="transactionManager"></property>
 		<property name="userService" ref="userServiceImpl"></property>
+	</bean>
+	 -->
+	
+	<bean id="userService" class="com.dazzilove.tobyspringstudy.user.service.TxProxyFactoryBean">
+		<property name="target" ref="userServiceImpl"></property>
+		<property name="transactionManager" ref="transactionManager"></property>
+		<property name="pattern" value="upgradeLevels"></property>
+		<property name="serviceInterface" value="com.dazzilove.tobyspringstudy.user.service.UserService"></property>
 	</bean>
 	
 	<bean id="userServiceImpl" class="com.dazzilove.tobyspringstudy.user.service.UserServiceImpl">

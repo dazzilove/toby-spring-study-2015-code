@@ -1,4 +1,4 @@
-package com.dazzilove.tobyspringstudy.proxytest;
+package com.dazzilove.learningtest.proxytest;
 
 public class HelloTarget implements Hello {
 

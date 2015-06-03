@@ -1,4 +1,4 @@
-package com.dazzilove.tobyspringstudy.proxytest;
+package com.dazzilove.learningtest.proxytest;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

@@ -1,9 +1,13 @@
-package com.dazzilove.tobyspringstudy.proxytest;
+package com.dazzilove.learningtest.proxytest;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 import org.junit.Test;
+
+import com.dazzilove.learningtest.proxytest.Hello;
+import com.dazzilove.learningtest.proxytest.HelloTarget;
+import com.dazzilove.learningtest.proxytest.HellowUppercase;
 
 public class SimpleProxyTest {
 
